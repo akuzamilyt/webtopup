@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaPrime - Halaman Top Up</title>
+    <!-- Menautkan ke file CSS utama Anda -->
+    <!-- Path relatif dari folder 'pages' ke folder 'css' -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Mengimport font dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=Bebas+Neue&display=swap');
+
+        /* Gaya spesifik untuk halaman top up */
+        /* Pastikan latar belakang tetap konsisten dengan halaman utama dari style.css */
+        /* body background dan header styling diambil dari style.css */
+
+        body {
+            /* Mengatur font Arimo untuk teks biasa */
+            font-family: 'Arimo', sans-serif;
+            /* Latar belakang halaman top up diambil dari ZaPrime.png di root folder proyek */
+            background-image: url('../ZaPrime.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: white;
+        }
+
+        /* Override background-color untuk content-wrapper agar lebih transparan */
+        .topup-content {
+            /* Tinggi minimum: 100% tinggi viewport dikurangi perkiraan tinggi header (80px) dan footer (40px) */
+            min-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Konten dimulai dari atas */
+            align-items: center;
+            text-align: center;
+            padding: 100px 20px 50px; /* Padding atas untuk header fixed, padding bawah untuk footer */
+            background-color: rgba(0, 0, 0, 0.6); /* Overlay lebih gelap agar konten lebih menonjol */
+        }
+
+        .topup-content h1 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            color: white; /* Warna teks judul */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Bayangan teks */
+            /* Mengatur font Bebas Neue untuk judul */
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Kolom responsif */
+            gap: 20px; /* Jarak antar kartu */
+            max-width: 1200px; /* Lebar maksimum container kartu */
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Gaya untuk kartu yang dapat diklik */
+        .topup-category-link {
+            text-decoration: none; /* Hapus garis bawah link */
+            color: inherit; /* Warisi warna teks dari parent */
+            display: flex; /* Agar link memenuhi kartu */
+            flex-direction: column;
+            width: 100%; /* Memastikan link memenuhi grid cell */
+        }
+
+        .topup-category-card {
+            background-color: rgba(0, 0, 0, 0.7); /* Latar belakang kartu hitam semi-transparan */
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 350px; /* Tinggi minimum kartu */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-image 0.3s ease;
+            text-align: center;
+            border: 2px solid transparent; /* Border default transparan */
+            cursor: pointer; /* Menunjukkan bahwa elemen dapat diklik */
+        }
+
+        .topup-category-card:hover {
+            transform: translateY(-5px); /* Efek naik saat dihover */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Bayangan lebih gelap saat dihover */
+            border-image: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #0000ff, #4b0082, #ee82ee) 1; /* Rainbow border on hover */
+        }
+
+        .topup-category-card h3 {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #add8e6; /* Warna judul kartu */
+            /* Mengatur font Bebas Neue untuk sub-judul kartu */
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .topup-category-card p {
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            /* Mengatur font Arimo untuk paragraf kartu */
+            font-family: 'Arimo', sans-serif;
+        }
+
+        .provider-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: auto; /* Mendorong logo ke bawah kartu */
+        }
+
+        .provider-logos img {
+            width: 60px; /* Ukuran logo provider */
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .game-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: auto; /* Mendorong logo ke bawah kartu */
+        }
+
+        .game-logos img {
+            width: 80px; /* Ukuran logo game */
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        /* Gaya untuk logo Akun Sharing yang lebih besar */
+        .sharing-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px; /* Jarak antar logo sharing */
+            margin-top: auto;
+        }
+
+        .sharing-logos img {
+            width: 80px; /* Ukuran logo Akun Sharing */
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .coming-soon-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffcc00; /* Warna kuning untuk "Coming Soon" */
+            margin-top: auto; /* Mendorong teks ke bawah */
+        }
+
+        .back-button {
+            background: #0056b3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-decoration: none; /* Untuk link */
+            display: inline-block; /* Agar bisa menerapkan padding dan margin dengan baik */
+            margin-top: 40px; /* Jarak dari kartu */
+        }
+
+        .back-button:hover {
+            background: #003d80;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .topup-content h1 {
+                font-size: 2.5em;
+            }
+            .card-container {
+                grid-template-columns: 1fr; /* Satu kolom di layar kecil */
+            }
+            .topup-category-card {
+                min-height: unset; /* Hapus min-height di mobile */
+            }
+        }
+        @media (max-width: 480px) {
+            .topup-category-card {
+                padding: 15px;
+            }
+            .topup-category-card h3 {
+                font-size: 1.5em;
+            }
+            .topup-category-card p {
+                font-size: 0.9em;
+            }
+            .provider-logos img, .game-logos img, .sharing-logos img {
+                width: 50px; /* Perkecil logo di layar sangat kecil */
+            }
+        }
+
+        /* Gaya untuk efek senter kursor */
+        #flashlight {
+            position: fixed; /* Tetap pada posisi viewport */
+            pointer-events: none; /* Penting! Agar tidak mengganggu interaksi elemen lain */
+            width: 80px; /* Ukuran senter */
+            height: 80px;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%); /* Cahaya gradien */
+            border-radius: 50%; /* Bentuk lingkaran */
+            transform: translate(-50%, -50%); /* Menengah senter pada posisi kursor */
+            z-index: 9999; /* Pastikan di atas semua elemen */
+            transition: width 0.1s ease, height 0.1s ease, opacity 0.2s ease; /* Transisi halus */
+            opacity: 0; /* Sembunyikan senter secara default */
+        }
+
+        body:hover #flashlight {
+            opacity: 1; /* Tampilkan senter saat mouse di atas body */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">ZAPRIME</div>
+        <nav>
+            <a href="../index.html#beranda">Beranda</a>
+            <a href="../index.html#layanan">Layanan</a>
+            <a href="../index.html#topup">Top Up</a>
+            <a href="../index.html#tentangkami">Tentang Kami</a>
+        </nav>
+    </header>
+
+    <div class="topup-content">
+        <h1>JENIS TOP UP</h1>
+        <div class="card-container">
+            <!-- Kartu PULSA - Sudah dapat diklik -->
+            <a href="pulsa-page.html" class="topup-category-link">
+                <div class="topup-category-card">
+                    <h3>PULSA</h3>
+                    <p>Kami Menyediakan Pulsa Hampir Semua Provider!</p>
+                    <div class="provider-logos">
+                        <!-- Menggunakan path dan nama file persis yang Anda berikan -->
+                        <img src="../images/telkoms.jpeg" alt="Logo Telkomsel">
+                        <img src="../images/xl-axiata-l-min.jpg" alt="Logo XL Axiata">
+                        <img src="../images/smartfren-logo-png_seeklogo-202951.png" alt="Logo Smartfren">
+                        <img src="../images/images.png" alt="Logo Indosat">
+                        <img src="../images/axiss.png" alt="Logo Axis">
+                        <img src="../images/3-logo-png_seeklogo-174303.png" alt="Logo Three">
+                    </div>
+                </div>
+            </a>
+
+            <!-- Kartu GAME - Sekarang dapat diklik -->
+            <a href="game-page.html" class="topup-category-link">
+                <div class="topup-category-card">
+                    <h3>GAME</h3>
+                    <p>Kami Menyediakan Jasa Top Up Game Mulai Dari:</p>
+                    <p>PUBGM, ML, FreeFire,Valorant, dan Lainnya!</p>
+                    <div class="game-logos">
+                        <!-- Menggunakan path dan nama file persis yang Anda berikan -->
+                        <img src="../images/pubgm.png" alt="Logo PUBG Mobile">
+                        <img src="../images/c9137e7a2879f90e22df9fc5cd3bf85f.jpg" alt="Logo Mobile Legends">
+                        <img src="../images/free-fire-logo-png_seeklogo-500424.png" alt="Logo Free Fire">
+                        <img src="../images/dowl.jpeg" alt="Logo Blood Strike">
+                    </div>
+                </div>
+            </a>
+
+            <!-- Kartu AKUN SHARING - Sekarang dapat diklik -->
+            <a href="akun-sharing-page.html" class="topup-category-link">
+                <div class="topup-category-card">
+                    <h3>AKUN SHARING</h3>
+                    <p>Kami Menyediakan Beberapa Aplikasi Akun Sharing/Private Dengan Garansi Yang Gak Tanggung-Tanggung!<p>
+                    <div class="sharing-logos">
+                        <!-- Menggunakan path dan nama file persis yang Anda berikan -->
+                        <img src="../images/imag22es.jpeg" alt="Logo AM (Alight Motion)">
+                        <img src="../images/ca" alt="Logo CapCut">
+                    </div>
+                </div>
+            </a>
+
+            <!-- Kartu COMING SOON - Sekarang dapat diklik -->
+            <a href="coming-soon-page.html" class="topup-category-link">
+                <div class="topup-category-card">
+                    <h3>COMING SOON</h3>
+                    <p class="coming-soon-text">Kami Akan Segera Hadir!!</p>
+                </div>
+            </a>
+        </div>
+
+        <a href="../index.html" class="back-button">Kembali ke Beranda</a>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 ZaPrime. Hak Cipta Dilindungi Undang-Undang.</p>
+    </footer>
+
+    <!-- Elemen untuk efek senter kursor -->
+    <div id="flashlight"></div>
+
+    <script>
+        const flashlight = document.getElementById('flashlight');
+
+        document.addEventListener('mousemove', (e) => {
+            flashlight.style.left = `${e.clientX}px`;
+            flashlight.style.top = `${e.clientY}px`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            flashlight.style.opacity = 0;
+        });
+
+        document.addEventListener('mouseenter', () => {
+            flashlight.style.opacity = 1;
+        });
+    </script>
+</body>
+</html>

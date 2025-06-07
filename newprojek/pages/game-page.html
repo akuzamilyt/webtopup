@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaPrime - Top Up Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        :root {
+            --primary-text: #ffffff; --secondary-text: #cccccc; --background-dark: #111827;
+            --navbar-bg: rgba(17, 24, 39, 0.8); --form-bg: #ffffff; --form-text: #343a40;
+            --form-border: #e2e8f0; --primary-color: #6366f1; --primary-color-light: rgba(99, 102, 241, 0.1);
+            --card-bg: #1f2937;
+        }
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--primary-text);
+            background-image: url('/ZaPrime.png'); background-size: cover; background-position: center;
+            background-attachment: fixed; background-color: var(--background-dark); min-height: 100vh; margin:0;
+        }
+        .navbar {
+            background-color: var(--navbar-bg); backdrop-filter: blur(10px); padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; width: 90%; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar .logo { font-size: 1.8rem; font-weight: 700; color: var(--primary-text); text-decoration: none; }
+        .navbar .nav-links { list-style: none; display: flex; gap: 2.5rem; margin: 0; padding: 0; }
+        .navbar .nav-links a { color: var(--secondary-text); text-decoration: none; font-size: 1rem; font-weight: 600; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-text); }
+        .main-content { padding-top: 100px; padding-bottom: 40px; display: flex; justify-content: center; align-items: flex-start; }
+        .container {
+            width: 100%; max-width: 800px; background-color: var(--card-bg);
+            color: var(--primary-text); border-radius: 16px; padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255,255,255,0.1);
+        }
+        .tabs { border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 30px; display: flex; gap: 20px; }
+        .tab-link { padding: 10px 0; background: none; border: none; color: var(--secondary-text); cursor: pointer; font-size: 1rem; font-weight: 600; border-bottom: 2px solid transparent; }
+        .tab-link.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        .section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; }
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .grid-item { border: 2px solid transparent; border-radius: 12px; overflow: hidden; text-align: center; cursor: pointer; transition: all 0.2s ease; background-color: #2b3648; }
+        .grid-item:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .grid-item.selected { border-color: var(--primary-color); box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
+        .grid-item img { width: 100%; height: 140px; object-fit: cover; }
+        .grid-item span { font-size: 0.9rem; font-weight: 500; padding: 10px; display: block; background-color: #374151; }
+        .game-form-container { background-color: #111827; padding: 25px; border-radius: 12px; margin-top: 30px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #374151; border-radius: 8px; font-size: 1rem; background-color: #1f2937; color: white; box-sizing: border-box; }
+        .user-id-wrapper { display: flex; gap: 10px; }
+        .error-message { color: #f87171; font-weight: 500; margin-top: 8px; min-height: 1.2em; }
+        .product-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        .product-item .nominal { font-weight: 600; }
+        .product-item .harga { color: var(--primary-color); font-weight: 500; }
+        .loader { text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/index.html" class="logo">ZAPRIME</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="/index.html">Beranda</a></li>
+            <li><a href="/pages/game-page.html" class="active">Layanan Game</a></li>
+            <li><a href="/pages/pulsa-page.html">Top Up Pulsa</a></li>
+            <li><a href="/pages/riwayat-pesanan.html">Riwayat</a></li>
+        </ul>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-link active">Games</button>
+            </div>
+            
+            <h2 class="section-title">Game Populer</h2>
+            <div class="selection-grid" id="game-grid">
+                 <!-- Daftar game diisi oleh JavaScript -->
+            </div>
+            
+            <div id="game-form" class="game-form-container" style="display: none;">
+                <div class="input-group">
+                    <label>2. Masukkan Data Akun</label>
+                    <div class="user-id-wrapper" id="user-id-fields">
+                        <!-- Input fields akan digenerate oleh JS -->
+                    </div>
+                </div>
+
+                <div id="product-section" class="product-section">
+                    <h2 class="section-title">3. Pilih Nominal</h2>
+                    <p id="fetchError" class="error-message"></p>
+                    <div id="loader" class="loader" style="display: none;">Memuat produk...</div>
+                    <div id="product-grid" class="selection-grid product-grid"></div>
+                </div>
+                 <!-- ... Sisa form akan ditambahkan nanti ... -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const gameListContainer = document.getElementById('game-grid');
+        const gameForm = document.getElementById('game-form');
+        const userIdFields = document.getElementById('user-id-fields');
+        const productGrid = document.getElementById('product-grid');
+        const loader = document.getElementById('loader');
+        const fetchError = document.getElementById('fetchError');
+        
+        // [FIXED] Database game dengan kebutuhan inputnya
+        const supportedGames = [
+            { code: 'MLBB', name: 'Mobile Legends', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/MLBB/100x100/MLBB_Diamond.png', inputs: ['userId', 'zoneId'] },
+            { code: 'FREEFIRE', name: 'Free Fire', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/FREEFIRE/100x100/FREEFIRE_DIAMOND.png', inputs: ['userId'] },
+            { code: 'FFMAX', name: 'Free Fire Max', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/FREEFIRE/100x100/FREEFIRE_DIAMOND.png', inputs: ['userId'] },
+            { code: 'PUBGM', name: 'PUBG Mobile', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/PUBGM/100x100/PUBG_MOBILE_UC.png', inputs: ['userId'] },
+            { code: 'HOK', name: 'Honor of Kings', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/HOK/100x100/HoK-Tokens.png', inputs: ['userId'] },
+            { code: 'VALORANT', name: 'Valorant', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/VALORANT/100x100/Valorant-Points.png', inputs: ['riotId'] }, // Menggunakan Riot ID
+            { code: 'GENSHIN', name: 'Genshin Impact', image: 'https://cdn1.codashop.com/S/content/common/images/denom-image/GENSHINIMPACT/100x100/GenshinImpact_GenesisCrystals.png', inputs: ['userId', 'server'] },
+        ];
+
+        // Tampilkan semua game yang didukung
+        supportedGames.forEach(game => {
+            const item = document.createElement('div');
+            item.className = 'grid-item';
+            item.dataset.gamecode = game.code;
+            item.innerHTML = `<img src="${game.image}" alt="${game.name}"><span>${game.name}</span>`;
+            
+            item.addEventListener('click', () => {
+                gameListContainer.querySelectorAll('.grid-item').forEach(el => el.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                const selectedGameData = supportedGames.find(g => g.code === game.code);
+                if (selectedGameData) {
+                    setupInputFields(selectedGameData.inputs);
+                }
+
+                gameForm.style.display = 'block';
+                fetchGameProducts(game.code);
+            });
+            gameListContainer.appendChild(item);
+        });
+
+        function setupInputFields(inputs) {
+            userIdFields.innerHTML = ''; // Kosongkan field sebelumnya
+            if (inputs.includes('userId')) {
+                userIdFields.innerHTML += '<input type="number" id="userId" placeholder="User ID">';
+            }
+            if (inputs.includes('zoneId')) {
+                userIdFields.innerHTML += '<input type="number" id="zoneId" placeholder="Zone ID">';
+            }
+             if (inputs.includes('riotId')) {
+                userIdFields.innerHTML += '<input type="text" id="riotId" placeholder="Riot ID (Contoh: Nama#TAG)">';
+            }
+            if (inputs.includes('server')) {
+                userIdFields.innerHTML += `
+                    <select id="serverSelect" style="width: 100%; padding: 12px 15px; border: 1px solid #374151; border-radius: 8px; font-size: 1rem; background-color: #1f2937; color: white;">
+                        <option value="os_asia">Asia Server</option>
+                        <option value="os_usa">America Server</option>
+                        <option value="os_euro">Europe Server</option>
+                        <option value="os_cht">TW, HK, MO Server</option>
+                    </select>
+                `;
+            }
+        }
+
+        async function fetchGameProducts(gameCode) {
+            productGrid.innerHTML = '';
+            fetchError.textContent = '';
+            loader.style.display = 'block';
+            try {
+                const response = await fetch('/api/game-products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gameCode }) });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.error || "Gagal memuat produk game.");
+                }
+                const products = await response.json();
+                displayGameProducts(products);
+            } catch (error) {
+                fetchError.textContent = `Error: ${error.message}`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function displayGameProducts(products) {
+            if (!products || products.length === 0) {
+                fetchError.textContent = 'Produk untuk game ini belum tersedia.';
+                return;
+            }
+            products.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'grid-item product-item';
+                item.dataset.code = p.code;
+                item.dataset.nominal = p.nominal;
+                item.dataset.harga = p.harga;
+                item.innerHTML = `<span class="nominal">${p.nominal}</span><span class="harga">${p.harga}</span>`;
+                productGrid.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>

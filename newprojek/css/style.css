@@ -1,0 +1,153 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  /* Path gambar tetap '../ZaPrime.png' sesuai permintaan Anda */
+  background-image: url('../ZaPrime.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white; /* Warna teks default untuk seluruh body */
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: rgba(0, 0, 0, 0.4);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease, transform 0.2s ease; /* Transisi halus untuk hover */
+}
+
+nav a:hover {
+  color: #add8e6; /* Warna terang saat dihover */
+  transform: translateY(-2px); /* Sedikit naik saat dihover */
+}
+
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: 80px; /* Memberi ruang dari header tetap */
+  background-color: rgba(0, 0, 0, 0.3); /* Overlay gelap agar teks lebih terbaca */
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.hero h2 {
+  font-size: 36px;
+  margin: 10px 0;
+}
+
+.hero p {
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.button-group {
+  display: flex; /* Mengatur tombol dalam satu baris */
+  flex-wrap: wrap; /* Memungkinkan tombol pindah baris pada layar kecil */
+  justify-content: center; /* Menengah tombol */
+  gap: 20px; /* Jarak antara tombol */
+}
+
+.button-group button {
+  background: black;
+  color: white;
+  border: 2px solid white;
+  padding: 10px 25px;
+  /* margin: 10px; */ /* Dihapus karena sudah ada 'gap' pada .button-group */
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  min-width: 150px; /* Memastikan lebar minimum untuk tombol */
+}
+
+.button-group button:hover {
+  background: white;
+  color: black;
+  transform: translateY(-2px); /* Sedikit naik saat dihover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Menambah bayangan saat dihover */
+}
+
+/* Media queries untuk responsivitas */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+  nav {
+    flex-direction: column; /* Tautan navigasi menjadi kolom di layar kecil */
+    align-items: center; /* Menengah tautan navigasi */
+    gap: 10px; /* Mengurangi jarak antar tautan */
+  }
+  nav a {
+    margin-left: 0; /* Menghapus margin kiri */
+  }
+  .logo {
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 36px;
+  }
+  .hero h2 {
+    font-size: 28px;
+  }
+  .hero p {
+    font-size: 18px;
+  }
+  .button-group {
+    flex-direction: column; /* Tombol menjadi kolom di layar kecil */
+    gap: 10px; /* Jarak antara tombol */
+  }
+  .button-group button {
+    width: 90%; /* Tombol lebih lebar di mobile */
+    max-width: 250px; /* Batasi lebar tombol */
+    margin: 0 auto; /* Tengah tombol di mobile */
+  }
+}
+
+/* Media queries untuk layar yang lebih kecil lagi (misal: ponsel sangat kecil) */
+@media (max-width: 480px) {
+  header {
+    padding: 10px 15px;
+  }
+  .hero h1 {
+    font-size: 30px;
+  }
+  .hero h2 {
+    font-size: 24px;
+  }
+  .hero p {
+    font-size: 16px;
+  }
+}

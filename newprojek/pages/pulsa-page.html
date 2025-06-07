@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaPrime - Halaman Top Up</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        :root {
+            --primary-text: #ffffff; --secondary-text: #cccccc; --background-dark: #111827;
+            --navbar-bg: rgba(17, 24, 39, 0.8); --form-bg: #ffffff; --form-text: #343a40;
+            --form-border: #e2e8f0; --primary-color: #007bff; --success-color: #28a745;
+        }
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--primary-text);
+            background-image: url('/ZaPrime.png'); background-size: cover; background-position: center;
+            background-attachment: fixed; background-color: var(--background-dark); min-height: 100vh; margin:0;
+        }
+        .navbar {
+            background-color: var(--navbar-bg); backdrop-filter: blur(10px); padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; width: 90%; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar .logo { font-size: 1.8rem; font-weight: 700; color: var(--primary-text); text-decoration: none; }
+        .navbar .nav-links { list-style: none; display: flex; gap: 2.5rem; margin: 0; padding: 0; }
+        .navbar .nav-links a { color: var(--secondary-text); text-decoration: none; font-size: 1rem; font-weight: 600; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-text); }
+        .main-content { padding-top: 120px; padding-bottom: 40px; display: flex; justify-content: center; align-items: flex-start; }
+        .container {
+            width: 100%; max-width: 600px; background-color: var(--form-bg);
+            color: var(--form-text); border-radius: 16px; padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        /* Styling Form */
+        .container h1 { text-align: center; color: var(--form-text); margin-bottom: 25px; font-weight: 700; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        .input-group input, .input-group select { width: 100%; padding: 12px 15px; border: 1px solid var(--form-border); border-radius: 8px; font-size: 1rem; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-primary { background-color: var(--primary-color); color: white; width: 100%; }
+        .btn:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.7; }
+        .section-title { font-size: 1.2rem; text-align:left; margin-bottom: 15px; border-bottom: 2px solid var(--form-border); padding-bottom: 10px; }
+        .product-grid, .payment-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .product-item, .payment-method { border: 1px solid var(--form-border); border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .product-item.selected, .payment-method.selected { border-color: var(--primary-color); background-color: rgba(0, 123, 255, 0.05); font-weight: 600; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); }
+        .product-item.unavailable { cursor: not-allowed; background-color: #f1f3f5; opacity: 0.6; }
+        .product-item.unavailable .harga { text-decoration: line-through; }
+        .product-item .nominal { font-weight: 600; }
+        .product-item .harga { color: var(--primary-color); font-weight: 500; }
+        .payment-method img { height: 25px; margin-bottom: 5px; object-fit: contain; }
+        .loader { text-align: center; padding: 20px; }
+        .error-message { color: #dc3545; font-weight: 500; margin-top: 8px; min-height: 1.2em; }
+        .summary-section { margin-top: 30px; background-color: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .summary-section p { margin: 5px 0; display: flex; justify-content: space-between; }
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1001; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center; position: relative; }
+        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; cursor: pointer; color: #aaa; }
+        #qris-image { max-width: 80%; height: auto; margin: 15px auto; border: 1px solid var(--form-border); }
+        .modal-amount { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .hamburger .bar { width: 25px; height: 3px; background-color: white; border-radius: 5px; }
+        @media (max-width: 768px) { .navbar .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--navbar-bg); padding: 1rem 0; text-align: center; } .navbar .nav-links.active { display: flex; } .hamburger { display: flex; } .main-content { padding: 80px 10px 20px 10px; } }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/index.html" class="logo">ZAPRIME</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="/index.html">Beranda</a></li>
+            <li><a href="/pages/coming-soon-page.html">Layanan</a></li>
+            <li><a href="/pages/pulsa-page.html" class="active">Top Up</a></li>
+            <li><a href="/pages/riwayat-pesanan.html">Riwayat</a></li>
+            <li><a href="/pages/coming-soon-page.html">Tentang Kami</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h1>Isi Ulang Pulsa & Data</h1>
+            <div class="input-group">
+                <label for="phoneNumber">Nomor Telepon</label>
+                <input type="tel" id="phoneNumber" placeholder="Contoh: 081234567890">
+            </div>
+            
+            <div class="input-group">
+                <label for="providerSelect">Pilih Provider</label>
+                <select id="providerSelect">
+                    <option value="">-- Pilih Provider --</option>
+                    <option value="Telkomsel">Telkomsel</option>
+                    <option value="Indosat">Indosat</option>
+                    <option value="XL Axiata">XL Axiata</option>
+                    <option value="Axis">Axis</option>
+                    <option value="Smartfren">Smartfren</option>
+                    <option value="Three">Three</option>
+                </select>
+            </div>
+            
+            <p id="fetchError" class="error-message"></p>
+            <div id="loader" class="loader" style="display: none;">Memuat produk...</div>
+
+            <div id="product-container" style="display: none;">
+                <div id="pulsa-section" class="product-section">
+                    <h2 class="section-title">Pilih Pulsa</h2>
+                    <div id="pulsa-grid" class="product-grid"></div>
+                </div>
+                <div id="paket-data-section" class="product-section">
+                    <h2 class="section-title">Pilih Paket Data & Lainnya</h2>
+                    <div id="paket-data-grid" class="product-grid"></div>
+                </div>
+            </div>
+
+            <div id="payment-section" class="payment-section" style="display: none;">
+                <h2 class="section-title">Pilih Metode Pembayaran</h2>
+                <div class="payment-methods">
+                    <div class="payment-method" data-method="QRIS">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/QRIS_logo.svg/1280px-QRIS_logo.svg.png" alt="QRIS">
+                        <span>QRIS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="summary" class="summary-section" style="display: none;">
+                 <h3>Detail Pembelian</h3>
+                 <p><span>Nomor Tujuan:</span> <span id="summary-phone"></span></p>
+                 <p><span>Produk:</span> <span id="summary-product"></span></p>
+                 <p><span>Harga:</span> <span id="summary-price"></span></p>
+                 <p><span>Metode:</span> <span id="summary-method"></span></p>
+            </div>
+            <div class="input-group" style="margin-top: 25px;">
+                 <button class="btn btn-primary" id="buyBtn" disabled style="padding: 15px;">Lanjut ke Pembayaran</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" id="modalCloseBtn">&times;</span>
+            <h3>Scan QRIS untuk Membayar</h3>
+            <img id="qris-image" src="https://api.qr-code-generator.com/v1/create?access-token=h02zGrL7sUq2x3wS5a16kE_yEaG-L6h9sU41aL1qja4D0kY8_Y-lD5jF0lI0aI1u&qr_code_text=https%3A%2F%2Fza-prime.com%2Fpay&image_format=SVG" alt="QRIS Code">
+            <p>Total yang harus dibayar:</p>
+            <p class="modal-amount" id="modal-amount"></p>
+            <p style="font-size: 0.8rem; color: #666;">Setelah melakukan pembayaran, klik tombol di bawah ini. Pesanan akan diverifikasi oleh Admin.</p>
+            <button class="btn btn-success" id="confirmPaymentBtn" style="width:100%;">Saya Sudah Bayar</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM ELEMENTS
+        const phoneInput = document.getElementById('phoneNumber');
+        const providerSelect = document.getElementById('providerSelect');
+        const fetchError = document.getElementById('fetchError');
+        const loader = document.getElementById('loader');
+        const productContainer = document.getElementById('product-container');
+        const pulsaGrid = document.getElementById('pulsa-grid');
+        const paketDataGrid = document.getElementById('paket-data-grid');
+        const pulsaSection = document.getElementById('pulsa-section');
+        const paketDataSection = document.getElementById('paket-data-section');
+        const paymentSection = document.getElementById('payment-section');
+        const summarySection = document.getElementById('summary');
+        const summaryPhone = document.getElementById('summary-phone');
+        const summaryProduct = document.getElementById('summary-product');
+        const summaryPrice = document.getElementById('summary-price');
+        const summaryMethod = document.getElementById('summary-method');
+        const buyBtn = document.getElementById('buyBtn');
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        const paymentModal = document.getElementById('paymentModal');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalAmount = document.getElementById('modal-amount');
+        const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+
+        let selectedProduct = null;
+        let selectedPaymentMethod = null;
+
+        // EVENT LISTENERS
+        hamburger.addEventListener('click', () => { navLinks.classList.toggle('active'); });
+        providerSelect.addEventListener('change', fetchProducts);
+        document.querySelectorAll('.payment-method').forEach(el => el.addEventListener('click', () => handlePaymentSelection(el)));
+        buyBtn.addEventListener('click', proceedToPayment);
+        modalCloseBtn.addEventListener('click', () => { paymentModal.style.display = 'none'; });
+        confirmPaymentBtn.addEventListener('click', sendOrderToServer);
+        
+        // [FIXED] FUNGSI LENGKAP DIKEMBALIKAN
+        async function fetchProducts() {
+            const provider = providerSelect.value;
+            if (!provider) {
+                productContainer.style.display = 'none';
+                paymentSection.style.display = 'none';
+                return;
+            }
+            
+            resetUI();
+            loader.style.display = 'block';
+            fetchError.textContent = '';
+
+            try {
+                const response = await fetch('/api/pulsa-harga', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ provider }) });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Gagal memproses respons server.'}));
+                    throw new Error(err.error || 'Gagal mengambil data produk.');
+                }
+                const data = await response.json();
+                if (!data.pulsaNominal && !data.paketData) {
+                    throw new Error('Tidak ada produk yang tersedia untuk provider ini.');
+                }
+                displayProducts(data);
+                paymentSection.style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                fetchError.textContent = `Error: ${error.message}`;
+                productContainer.style.display = 'none';
+                paymentSection.style.display = 'none';
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function displayProducts(data) {
+            pulsaGrid.innerHTML = '';
+            paketDataGrid.innerHTML = '';
+            if (data.pulsaNominal && data.pulsaNominal.length > 0) {
+                data.pulsaNominal.forEach(p => pulsaGrid.appendChild(createProductItem(p)));
+                pulsaSection.style.display = 'block';
+            } else {
+                 pulsaSection.style.display = 'none';
+            }
+            if (data.paketData && data.paketData.length > 0) {
+                data.paketData.forEach(p => paketDataGrid.appendChild(createProductItem(p)));
+                paketDataSection.style.display = 'block';
+            } else {
+                 paketDataSection.style.display = 'none';
+            }
+            productContainer.style.display = 'block';
+        }
+        
+        function createProductItem(product) {
+            const item = document.createElement('div');
+            item.className = 'product-item';
+            if (product.status !== 'available') {
+                item.classList.add('unavailable');
+            }
+            item.dataset.code = product.code;
+            item.dataset.nominal = product.nominal;
+            item.dataset.harga = product.harga;
+            item.innerHTML = `<div class="nominal">${product.nominal}</div><div class="harga">${product.harga}</div>`;
+            if (product.status === 'available') {
+                item.addEventListener('click', () => handleProductSelection(item));
+            }
+            return item;
+        }
+
+        function handleProductSelection(selectedElement) {
+            document.querySelectorAll('.product-item.selected').forEach(el => el.classList.remove('selected'));
+            selectedElement.classList.add('selected');
+            selectedProduct = selectedElement.dataset;
+            updateSummary();
+        }
+
+        function handlePaymentSelection(selectedElement) {
+            document.querySelectorAll('.payment-method.selected').forEach(el => el.classList.remove('selected'));
+            selectedElement.classList.add('selected');
+            selectedPaymentMethod = selectedElement.dataset.method;
+            updateSummary();
+        }
+
+        function updateSummary() {
+            if (phoneInput.value && selectedProduct && selectedPaymentMethod) {
+                summaryPhone.textContent = phoneInput.value;
+                summaryProduct.textContent = selectedProduct.nominal;
+                summaryPrice.textContent = selectedProduct.harga;
+                summaryMethod.textContent = selectedPaymentMethod;
+                summarySection.style.display = 'block';
+                buyBtn.disabled = false;
+            } else {
+                summarySection.style.display = 'none';
+                buyBtn.disabled = true;
+            }
+        }
+
+        function resetUI() {
+            selectedProduct = null;
+            selectedPaymentMethod = null;
+            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            updateSummary();
+            productContainer.style.display = 'none';
+            paymentSection.style.display = 'none';
+        }
+
+        function proceedToPayment() {
+            if (!phoneInput.value || !selectedProduct || !selectedPaymentMethod) {
+                alert('Silakan isi nomor telepon, pilih produk, dan metode pembayaran terlebih dahulu.');
+                return;
+            }
+            modalAmount.textContent = selectedProduct.harga;
+            paymentModal.style.display = 'flex';
+        }
+
+        async function sendOrderToServer() {
+            const dataPesanan = {
+                phoneNumber: phoneInput.value,
+                nominal: selectedProduct.nominal,
+                harga: selectedProduct.harga,
+                code: selectedProduct.code,
+                paymentMethod: selectedPaymentMethod
+            };
+            if (!dataPesanan.code) { alert('Terjadi kesalahan: Kode produk tidak valid.'); return; }
+            
+            confirmPaymentBtn.disabled = true;
+            confirmPaymentBtn.textContent = 'Memproses...';
+
+            try {
+                const response = await fetch('/api/pending-order-notification', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataPesanan) });
+                const hasil = await response.json();
+                if (response.ok && hasil.success) {
+                    alert('Pesanan berhasil dibuat! Anda bisa melihat statusnya di halaman Riwayat.');
+                    paymentModal.style.display = 'none';
+                    resetUI();
+                    providerSelect.value = '';
+                    phoneInput.value = '';
+                } else {
+                    throw new Error(hasil.error || 'Gagal mengirim pesanan ke server.');
+                }
+            } catch (error) {
+                console.error('Error saat konfirmasi pembayaran:', error);
+                alert(`Terjadi kesalahan: ${error.message}`);
+            } finally {
+                confirmPaymentBtn.disabled = false;
+                confirmPaymentBtn.textContent = 'Saya Sudah Bayar';
+            }
+        }
+    </script>
+</body>
+</html>

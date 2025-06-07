@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Pesanan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        :root {
+            --primary-color: #007bff; --success-color: #28a745; --danger-color: #dc3545;
+            --warning-color: #ffc107; --info-color: #17a2b8;
+        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 20px auto; background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; margin-bottom: 30px; }
+        .filter-controls { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .filter-controls button { background-color: #f8f9fa; color: #333; border: 1px solid #dee2e6; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin: 0 5px; transition: all 0.2s; font-weight: 500; }
+        .filter-controls button:hover { background-color: #e9ecef; }
+        .filter-controls button.active { background-color: #0056b3; color: white; border-color: #0056b3; }
+        .order-list { display: grid; gap: 20px; }
+        .order-item { padding: 20px; border-radius: 8px; border-left: 5px solid; background-color: #f8f9fa; }
+        .order-item[data-status="menunggu_verifikasi"] { border-color: var(--warning-color); background-color: #fff9e6; }
+        .order-item[data-status="memproses"] { border-color: var(--info-color); background-color: #e2f7fa; }
+        .order-item[data-status="sukses"] { border-color: var(--success-color); background-color: #d4edda; }
+        .order-item[data-status="error"] { border-color: var(--danger-color); background-color: #f8d7da; }
+        .order-item p { margin: 5px 0; font-size: 0.95em; }
+        .order-item strong { display: inline-block; width: 120px; color: #495057; }
+        .order-actions { margin-top: 15px; text-align: right; }
+        .order-actions button { color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 500; }
+        .order-actions button.process-btn { background-color: var(--primary-color); }
+        .order-actions button:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.7; }
+        .detail-error { color: var(--danger-color); font-style: italic; font-size: 0.9em; margin-top: 8px; word-break: break-all; }
+        .note-form { display: flex; gap: 10px; margin-top: 12px; }
+        .note-form input { flex-grow: 1; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .note-form button { padding: 8px 12px; font-size: 0.9em; }
+        .no-orders { text-align: center; color: #6c757d; padding: 50px; border: 2px dashed #ddd; border-radius: 8px; }
+        .error-message { color: var(--danger-color); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel Pesanan</h1>
+        <div class="filter-controls">
+            <button onclick="filterOrders('all')" id="filter-all" class="active">Semua</button>
+            <button onclick="filterOrders('menunggu_verifikasi')" id="filter-menunggu_verifikasi">Menunggu</button>
+            <button onclick="filterOrders('memproses')" id="filter-memproses">Memproses</button>
+            <button onclick="filterOrders('sukses')" id="filter-sukses">Sukses</button>
+            <button onclick="filterOrders('error')" id="filter-error">Gagal</button>
+        </div>
+        <div class="order-list" id="orderList">
+            <div class="no-orders"><p>Memuat data...</p></div>
+        </div>
+    </div>
+
+    <script>
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => fetchOrdersAndRender('all'));
+
+        async function fetchOrdersAndRender(filter) {
+            currentFilter = filter;
+            const orderListContainer = document.getElementById('orderList');
+            orderListContainer.innerHTML = `<div class="no-orders"><p>Memuat data...</p></div>`;
+            try {
+                const response = await fetch(`${window.location.origin}/api/admin/get-orders`);
+                if (response.status === 401 || response.redirected) {
+                    alert("Sesi Anda telah berakhir atau Anda belum login. Anda akan diarahkan ke halaman login.");
+                    window.location.href = '/admin-login-page';
+                    return;
+                }
+                if (!response.ok) throw new Error(`Gagal mengambil data: ${response.statusText}`);
+                allOrders = await response.json();
+                renderOrders();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                orderListContainer.innerHTML = `<div class="no-orders"><p class="error-message">Gagal memuat data dari server.</p></div>`;
+            }
+        }
+
+        function renderOrders() {
+            const orderListContainer = document.getElementById('orderList');
+            orderListContainer.innerHTML = '';
+            const filteredOrders = allOrders.filter(order => currentFilter === 'all' || order.statusInternal === currentFilter);
+            
+            if (filteredOrders.length === 0) {
+                 orderListContainer.innerHTML = `<div class="no-orders"><p>Tidak ada pesanan untuk filter ini.</p></div>`;
+                 return;
+            }
+
+            filteredOrders.sort((a,b) => b.timestamp - a.timestamp).forEach(order => {
+                const item = document.createElement('div');
+                item.className = 'order-item';
+                item.dataset.status = order.statusInternal;
+
+                let actionButton = `<button disabled>${order.statusInternal.replace(/_/g, ' ')}</button>`;
+                if(order.statusInternal === 'menunggu_verifikasi' || order.statusInternal === 'error') {
+                    actionButton = `<button class="process-btn" onclick="processThisOrder('${order.id}', this)">Proses</button>`;
+                }
+                
+                const errorInfo = order.statusInternal === 'error' ? `<p class="detail-error"><strong>Detail Error (Admin):</strong> ${order.adminErrorMessage || 'Tidak ada detail'}</p>` : '';
+                
+                const noteForm = order.statusInternal === 'error' 
+                    ? `<div class="note-form" id="note-form-${order.id}">
+                           <input type="text" id="note-input-${order.id}" placeholder="Tulis pesan untuk pelanggan..." value="${order.customAdminNote || ''}">
+                           <button class="process-btn" onclick="saveCustomNote('${order.id}', this)">Simpan Pesan</button>
+                       </div>` 
+                    : '';
+
+                item.innerHTML = `
+                    <p><strong>ID Pesanan:</strong> ${order.id}</p>
+                    <p><strong>Nomor HP:</strong> ${order.phoneNumber}</p>
+                    <p><strong>Produk:</strong> ${order.nominal} (${order.code})</p>
+                    <p><strong>Waktu:</strong> ${new Date(order.timestamp).toLocaleString('id-ID')}</p>
+                    <p><strong>Status:</strong> ${order.statusInternal.replace(/_/g, ' ')}</p>
+                    ${errorInfo}
+                    ${noteForm}
+                    <div class="order-actions">${actionButton}</div>
+                `;
+                orderListContainer.appendChild(item);
+            });
+        }
+        
+        async function processThisOrder(orderId, buttonElement) {
+            buttonElement.disabled = true;
+            buttonElement.textContent = 'Memproses...';
+            try {
+                const response = await fetch(`${window.location.origin}/api/admin/process-order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: orderId })
+                });
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Proses di server gagal.');
+                }
+                await fetchOrdersAndRender(currentFilter);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                await fetchOrdersAndRender(currentFilter);
+            }
+        }
+        
+        async function saveCustomNote(orderId, buttonElement) {
+            const noteInput = document.getElementById(`note-input-${orderId}`);
+            const note = noteInput.value;
+            buttonElement.disabled = true;
+            buttonElement.textContent = '...';
+            try {
+                const response = await fetch(`${window.location.origin}/api/admin/update-note`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId, note })
+                });
+                if (!response.ok) throw new Error('Gagal menyimpan catatan.');
+                const order = allOrders.find(o => o.id === orderId);
+                if(order) order.customAdminNote = note;
+                alert('Pesan untuk pelanggan berhasil disimpan!');
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                buttonElement.disabled = false;
+                buttonElement.textContent = 'Simpan Pesan';
+            }
+        }
+
+        function filterOrders(status) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-controls button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`filter-${status}`).classList.add('active');
+            renderOrders();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaPrime - Riwayat Pesanan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        :root {
+            --primary-text: #ffffff; --secondary-text: #cccccc; --background-dark: #111827;
+            --navbar-bg: rgba(17, 24, 39, 0.8); --form-bg: #ffffff; --form-text: #343a40;
+            --success-color: #28a745; --danger-color: #dc3545; --warning-color: #ffc107;
+        }
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--primary-text);
+            background-image: url('/ZaPrime.png'); background-size: cover; background-position: center;
+            background-attachment: fixed; background-color: var(--background-dark); min-height: 100vh; margin:0;
+        }
+        .navbar {
+            background-color: var(--navbar-bg); backdrop-filter: blur(10px); padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; width: 90%; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar .logo { font-size: 1.8rem; font-weight: 700; color: var(--primary-text); text-decoration: none; }
+        .navbar .nav-links { list-style: none; display: flex; gap: 2.5rem; }
+        .navbar .nav-links a { color: var(--secondary-text); text-decoration: none; font-size: 1rem; font-weight: 600; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-text); }
+        .main-content { padding-top: 100px; padding-bottom: 40px; display: flex; justify-content: center; }
+        .container {
+            width: 100%; max-width: 700px; background-color: transparent;
+            color: var(--primary-text); border-radius: 16px; padding: 10px;
+        }
+        .history-item {
+            background-color: #fff; color: var(--form-text); padding: 15px 20px;
+            border-radius: 8px; margin-bottom: 12px; border-left: 5px solid;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .history-item p { margin: 3px 0; font-size: 0.9rem; }
+        .history-item .product-name { font-weight: 600; font-size: 1rem; }
+        .history-item .status { font-weight: 700; text-transform: capitalize; }
+        .history-item[data-status="menunggu_verifikasi"] { border-color: var(--warning-color); }
+        .history-item[data-status="sukses"] { border-color: var(--success-color); }
+        .history-item[data-status="error"] { border-color: var(--danger-color); }
+        .customer-note { background-color: #e9ecef; color: #495057; border-radius: 4px; padding: 10px; font-size: 0.9em; margin-top: 8px; font-style: italic; word-break: break-word; }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .hamburger .bar { width: 25px; height: 3px; background-color: white; border-radius: 5px; }
+        .no-history-box { text-align: center; color: #ccc; padding: 40px; background-color: rgba(0,0,0,0.2); border-radius: 8px; }
+        @media (max-width: 768px) {
+            .navbar .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background-color: var(--navbar-bg); padding: 1rem 0; text-align: center; }
+            .navbar .nav-links.active { display: flex; }
+            .hamburger { display: flex; }
+            .main-content { padding: 80px 10px 20px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/index.html" class="logo">ZAPRIME</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="/index.html">Beranda</a></li>
+            <li><a href="/pages/coming-soon-page.html">Layanan</a></li>
+            <li><a href="/pages/pulsa-page.html">Top Up</a></li>
+            <li><a href="/pages/riwayat-pesanan.html" class="active">Riwayat</a></li>
+            <li><a href="/pages/coming-soon-page.html">Tentang Kami</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container history-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px;">
+                <h2 style="color: white; margin: 0;">Riwayat Pesanan Anda</h2>
+                <button id="refreshHistoryBtn" style="padding: 8px 15px; cursor: pointer; border-radius: 5px; border: 1px solid white; background: rgba(255,255,255,0.1); color: white;">Refresh</button>
+            </div>
+            <div id="historyList">
+                <div class="no-history-box">
+                    <p>Memuat riwayat...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const historyList = document.getElementById('historyList');
+        const refreshHistoryBtn = document.getElementById('refreshHistoryBtn');
+
+        async function fetchMyOrders() {
+            historyList.innerHTML = `<div class="no-history-box"><p>Memuat riwayat...</p></div>`;
+            try {
+                // [FIXED] Menggunakan window.location.origin untuk memastikan URL lengkap
+                const response = await fetch(`${window.location.origin}/api/my-orders`);
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({ error: 'Gagal mengambil data riwayat dari server.' }));
+                    throw new Error(errData.error);
+                }
+                const orders = await response.json();
+                displayHistory(orders);
+            } catch (error) {
+                console.error("Fetch History Error:", error);
+                historyList.innerHTML = `<div class="no-history-box"><p style="color: #ff8a8a;">${error.message}</p></div>`;
+            }
+        }
+
+        function displayHistory(orders) {
+            historyList.innerHTML = '';
+            if (orders.length === 0) {
+                historyList.innerHTML = `<div class="no-history-box"><p>Anda belum memiliki riwayat pesanan.</p></div>`;
+                return;
+            }
+            orders.sort((a, b) => b.timestamp - a.timestamp).forEach(order => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.dataset.status = order.statusInternal;
+
+                const statusText = order.statusInternal.replace(/_/g, ' ');
+
+                let noteHtml = '';
+                if (order.statusInternal === 'error') {
+                    const reason = order.customAdminNote || order.customerErrorMessage || 'Tidak ada detail.';
+                    noteHtml = `<div class="customer-note"><strong>Catatan:</strong> ${reason}</div>`;
+                } else if (order.customAdminNote) {
+                     noteHtml = `<div class="customer-note"><strong>Catatan:</strong> ${order.customAdminNote}</div>`;
+                }
+
+                item.innerHTML = `
+                    <p class="product-name">${order.nominal || 'N/A'}</p>
+                    <p><strong>No:</strong> ${order.phoneNumber}</p>
+                    <p><strong>Waktu:</strong> ${new Date(order.timestamp).toLocaleString('id-ID')}</p>
+                    <p><strong>Status:</strong> <span class="status">${statusText}</span></p>
+                    ${noteHtml}
+                `;
+                historyList.appendChild(item);
+            });
+        }
+        
+        refreshHistoryBtn.addEventListener('click', fetchMyOrders);
+        document.addEventListener('DOMContentLoaded', fetchMyOrders);
+        document.getElementById('hamburger').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

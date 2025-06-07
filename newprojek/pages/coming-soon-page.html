@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaPrime - Segera Hadir</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=Bebas+Neue&display=swap');
+
+        body {
+            font-family: 'Arimo', sans-serif;
+            background-image: url('../ZaPrime.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: white;
+        }
+
+        .coming-soon-content {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 100px 20px 50px;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .coming-soon-card-detail {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        .coming-soon-card-detail h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3em;
+            margin-bottom: 25px;
+            color: #e6b300; /* Warna kuning untuk judul coming soon */
+        }
+
+        .coming-soon-card-detail p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            background: #0056b3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 40px;
+        }
+
+        .back-button:hover {
+            background: #003d80;
+            transform: translateY(-2px);
+        }
+
+        #flashlight {
+            position: fixed;
+            pointer-events: none;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: width 0.1s ease, height 0.1s ease, opacity 0.2s ease;
+            opacity: 0;
+        }
+
+        body:hover #flashlight {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .coming-soon-card-detail {
+                padding: 25px;
+            }
+            .coming-soon-card-detail h1 {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">ZAPRIME</div>
+        <nav>
+            <a href="../index.html#beranda">Beranda</a>
+            <a href="../index.html#layanan">Layanan</a>
+            <a href="topup-page.html">Top Up</a> <!-- Kembali ke halaman jenis top up -->
+            <a href="../index.html#tentangkami">Tentang Kami</a>
+        </nav>
+    </header>
+
+    <div class="coming-soon-content">
+        <div class="coming-soon-card-detail">
+            <h1>Segera Hadir!</h1>
+            <p>Fitur ini sedang dalam tahap pengembangan dan akan segera tersedia.</p>
+            <p>Mohon bersabar dan nantikan pembaruan menarik dari kami!</p>
+            <a href="topup-page.html" class="back-button">Kembali ke Jenis Top Up</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 ZaPrime. Hak Cipta Dilindungi Undang-Undang.</p>
+    </footer>
+
+    <div id="flashlight"></div>
+    <script>
+        const flashlight = document.getElementById('flashlight');
+        document.addEventListener('mousemove', (e) => {
+            flashlight.style.left = `${e.clientX}px`;
+            flashlight.style.top = `${e.clientY}px`;
+        });
+        document.addEventListener('mouseleave', () => {
+            flashlight.style.opacity = 0;
+        });
+        document.addEventListener('mouseenter', () => {
+            flashlight.style.opacity = 1;
+        });
+    </script>
+</body>
+</html>

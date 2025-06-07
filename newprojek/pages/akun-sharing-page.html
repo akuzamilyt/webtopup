@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaPrime - Top Up Pulsa</title>
+    <!-- Menautkan ke file CSS utama Anda -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Mengimport font dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=Bebas+Neue&display=swap');
+
+        body {
+            font-family: 'Arimo', sans-serif;
+            background-image: url('../ZaPrime.png'); /* Menggunakan gambar latar belakang yang sama */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: white;
+        }
+
+        .pulsa-detail-content {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Konten dimulai dari atas */
+            align-items: center;
+            text-align: center;
+            padding: 100px 20px 50px;
+            background-color: rgba(0, 0, 0, 0.7); /* Overlay lebih gelap untuk fokus konten */
+        }
+
+        .pulsa-card-detail {
+            background-color: rgba(255, 255, 255, 0.95); /* Kartu detail lebih solid */
+            color: #333;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        .pulsa-card-detail h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3em;
+            margin-bottom: 25px;
+            color: #0056b3;
+        }
+
+        .pulsa-card-detail p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .pulsa-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .pulsa-option-item {
+            background-color: #e0f2f7; /* Warna latar belakang untuk opsi pulsa */
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #0056b3;
+            border: 2px solid #0056b3;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex; /* Untuk menengahkan teks dan harga */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pulsa-option-item:hover {
+            background-color: #b3e5fc;
+            transform: translateY(-3px);
+        }
+
+        .pulsa-option-item .nominal {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .pulsa-option-item .harga {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            color: #0056b3;
+            margin-top: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #0056b3; /* Blue */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            background: #0056b3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 40px;
+        }
+
+        .back-button:hover {
+            background: #003d80;
+            transform: translateY(-2px);
+        }
+
+        /* Gaya untuk efek senter kursor */
+        #flashlight {
+            position: fixed;
+            pointer-events: none;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: width 0.1s ease, height 0.1s ease, opacity 0.2s ease;
+            opacity: 0;
+        }
+
+        body:hover #flashlight {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .pulsa-card-detail {
+                padding: 25px;
+            }
+            .pulsa-card-detail h1 {
+                font-size: 2.5em;
+            }
+            .pulsa-option-item {
+                padding: 15px;
+            }
+        }
+
+        /* Gaya untuk pesan notifikasi kustom */
+        .custom-message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: #333;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            display: none; /* Sembunyikan secara default */
+            max-width: 350px;
+            text-align: center;
+            font-family: 'Arimo', sans-serif;
+            border: 2px solid #0056b3;
+        }
+
+        .custom-message-box h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #0056b3;
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .custom-message-box p {
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+
+        .custom-message-box button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-message-box button:hover {
+            background-color: #003d80;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">ZAPRIME</div>
+        <nav>
+            <a href="../index.html#beranda">Beranda</a>
+            <a href="../index.html#layanan">Layanan</a>
+            <a href="topup-page.html">Top Up</a>
+            <a href="../index.html#tentangkami">Tentang Kami</a>
+        </nav>
+    </header>
+
+    <div class="pulsa-detail-content">
+        <div class="pulsa-card-detail">
+            <h1>Top Up Pulsa</h1>
+            <p>Pilih nominal pulsa yang Anda inginkan dari berbagai provider yang tersedia.</p>
+            <div id="pulsaOptionsContainer" class="pulsa-options">
+                <!-- Data pulsa akan dimuat di sini dari API -->
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    Memuat daftar pulsa...
+                </div>
+            </div>
+            <a href="topup-page.html" class="back-button">Kembali ke Jenis Top Up</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 ZaPrime. Hak Cipta Dilindungi Undang-Undang.</p>
+    </footer>
+
+    <!-- Elemen untuk efek senter kursor -->
+    <div id="flashlight"></div>
+
+    <!-- Kotak pesan notifikasi kustom -->
+    <div id="customMessageBox" class="custom-message-box">
+        <h3 id="messageBoxTitle">Pemberitahuan</h3>
+        <p id="messageBoxContent">Ini adalah pesan default.</p>
+        <button id="messageBoxCloseBtn">OK</button>
+    </div>
+
+    <script>
+        const flashlight = document.getElementById('flashlight');
+        document.addEventListener('mousemove', (e) => {
+            flashlight.style.left = `${e.clientX}px`;
+            flashlight.style.top = `${e.clientY}px`;
+        });
+        document.addEventListener('mouseleave', () => {
+            flashlight.style.opacity = 0;
+        });
+        document.addEventListener('mouseenter', () => {
+            flashlight.style.opacity = 1;
+        });
+
+        // Fungsi untuk menampilkan pesan kustom
+        function showCustomMessage(title, message) {
+            const messageBox = document.getElementById('customMessageBox');
+            document.getElementById('messageBoxTitle').textContent = title;
+            document.getElementById('messageBoxContent').textContent = message;
+            messageBox.style.display = 'block';
+        }
+
+        // Fungsi untuk menyembunyikan pesan kustom
+        document.getElementById('messageBoxCloseBtn').addEventListener('click', () => {
+            document.getElementById('customMessageBox').style.display = 'none';
+        });
+
+
+        // --- Integrasi API untuk Data Pulsa ---
+        const pulsaOptionsContainer = document.getElementById('pulsaOptionsContainer');
+
+        async function fetchPulsaData() {
+            pulsaOptionsContainer.innerHTML = `
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    Memuat daftar pulsa...
+                </div>
+            `; // Tampilkan loading indicator
+
+            try {
+                // Simulasi data dari API
+                // Penting: Jika Anda menjalankan ini sebagai file:/// (file lokal),
+                // browser mungkin memblokir 'fetch' (meskipun disimulasikan dengan Promise).
+                // Untuk mengatasinya, gunakan server web lokal (misal: python -m http.server).
+                const response = await new Promise(resolve => setTimeout(() => {
+                    resolve({
+                        ok: true,
+                        json: () => Promise.resolve([
+                            { nominal: 'Rp 10.000', harga: 'Rp 10.500' },
+                            { nominal: 'Rp 25.000', harga: 'Rp 25.800' },
+                            { nominal: 'Rp 50.000', harga: 'Rp 51.500' },
+                            { nominal: 'Rp 100.000', harga: 'Rp 102.000' },
+                            { nominal: 'Rp 150.000', harga: 'Rp 152.500' },
+                            { nominal: 'Rp 200.000', harga: 'Rp 203.000' }
+                        ])
+                    });
+                }, 1500)); // Simulasi delay 1.5 detik
+
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data pulsa.');
+                }
+
+                const data = await response.json();
+                
+                pulsaOptionsContainer.innerHTML = ''; // Kosongkan loading indicator
+
+                if (data.length === 0) {
+                    pulsaOptionsContainer.innerHTML = '<p>Tidak ada data pulsa tersedia.</p>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const pulsaItemDiv = document.createElement('div');
+                    pulsaItemDiv.classList.add('pulsa-option-item');
+                    pulsaItemDiv.innerHTML = `
+                        <div class="nominal">${item.nominal}</div>
+                        <div class="harga">${item.harga}</div>
+                    `;
+                    // Tambahkan event listener agar item bisa diklik
+                    pulsaItemDiv.addEventListener('click', () => {
+                        console.log(`Pulsa item clicked: ${item.nominal}`); // Debugging: log ke konsol
+                        showCustomMessage('Top Up Pulsa', `Anda memilih ${item.nominal} dengan harga ${item.harga}.`);
+                        // Di sini Anda bisa menambahkan logika untuk melanjutkan ke halaman pembayaran atau keranjang
+                    });
+                    pulsaOptionsContainer.appendChild(pulsaItemDiv);
+                });
+
+            } catch (error) {
+                console.error("Error fetching pulsa data:", error);
+                pulsaOptionsContainer.innerHTML = `<p class="error-message">Terjadi kesalahan: ${error.message}</p>`;
+            }
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchPulsaData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZaPrime - Top Up</title>
+  <!-- Menautkan ke file CSS eksternal Anda -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">ZAPRIME</div>
+    <nav>
+      <!-- Tautan navigasi yang berfungsi, menunjuk ke ID di halaman -->
+      <a href="#beranda">Beranda</a>
+      <a href="#layanan">Layanan</a>
+      <!-- Tautan Top Up sekarang akan mengarah langsung ke halaman topup-page.html -->
+      <a href="pages/topup-page.html">Top Up</a>
+      <a href="#tentangkami">Tentang Kami</a>
+    </nav>
+  </header>
+
+  <!-- Bagian Hero/Beranda -->
+  <main class="hero" id="beranda">
+    <h1>ZAPRIME</h1>
+    <h2>Top Up & Layanan</h2>
+    <p>100% Terpercaya</p>
+    <div class="button-group">
+      <!-- Tombol Top Up Disini akan mengalihkan ke halaman baru -->
+      <button type="button" onclick="location.href='pages/topup-page.html'">Top Up Disini</button>
+      <!-- Tombol Layanan Kami sekarang akan menggulir ke bagian dengan ID #layanan -->
+      <button type="button" onclick="location.href='#layanan'">Layanan Kami</button>
+    </div>
+  </main>
+
+  <!-- Bagian Layanan -->
+  <section id="layanan" class="content-section">
+    <h2>Layanan Kami</h2>
+    <p>Di sini Anda dapat menemukan berbagai layanan top up dan layanan lainnya yang kami sediakan.</p>
+    <p>Kami memastikan pengalaman yang cepat dan terpercaya untuk semua kebutuhan Anda.</p>
+  </section>
+
+  <!-- Bagian Tentang Kami -->
+  <section id="tentangkami" class="content-section">
+    <h2>Tentang Kami</h2>
+    <p>Pelajari lebih lanjut tentang ZaPrime, visi, misi, dan komitmen kami kepada pelanggan.</p>
+    <p>Kami berdedikasi untuk memberikan layanan terbaik.</p>
+  </section>
+
+  <footer class="footer">
+      <p>&copy; 2025 ZaPrime. Hak Cipta Dilindungi Undang-Undang.</p>
+  </footer>
+
+  <style>
+    /* CSS tambahan untuk bagian konten baru, bisa dipindahkan ke style.css jika diinginkan */
+    .content-section {
+      padding: 80px 30px; /* Padding atas untuk memberi ruang dari header fixed */
+      margin: 0 auto;
+      max-width: 800px;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.9); /* Latar belakang semi-transparan */
+      color: #333; /* Warna teks gelap */
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .content-section:first-of-type {
+        margin-top: 30px; /* Jarak dari hero section */
+    }
+
+    .content-section h2 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #0056b3;
+    }
+
+    .content-section p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      margin-top: 50px;
+    }
+
+    /* Media queries untuk konten section */
+    @media (max-width: 768px) {
+      .content-section {
+        padding: 60px 20px;
+      }
+      .content-section h2 {
+        font-size: 28px;
+      }
+      .content-section p {
+        font-size: 16px;
+      }
+    }
+
+    /* CSS untuk tombol (dipindahkan dari style.css jika Anda ingin mengujinya di sini,
+       atau tambahkan ini langsung ke style.css Anda) */
+    .button-group {
+      display: flex; /* Mengatur tombol dalam satu baris */
+      flex-wrap: wrap; /* Memungkinkan tombol pindah baris pada layar kecil */
+      justify-content: center; /* Menengah tombol */
+      gap: 20px; /* Jarak antara tombol */
+    }
+
+    .button-group button {
+      background: black;
+      color: white;
+      /* Menambahkan border rainbow */
+      border: 3px solid transparent; /* Border transparan sebagai dasar untuk border-image */
+      border-image: linear-gradient(to right, #ff0000, #ffa500, #ffff00, #008000, #0000ff, #4b0082, #ee82ee) 1;
+      /* Warna: Merah, Oranye, Kuning, Hijau, Biru, Nila, Ungu */
+      padding: 10px 25px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      min-width: 150px;
+    }
+
+    .button-group button:hover {
+      background: white;
+      color: black;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</body>
+</html>
